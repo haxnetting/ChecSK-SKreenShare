@@ -1,0 +1,77 @@
+options:
+  prefix: &3YourServer&5Server
+
+command /check [<text>] [<offline player>]:
+  permission: check.staff
+  permission message: &4You need to be in staff to use that command!
+  trigger:
+    if arg-1 is not set:
+      send "&cYou need to enter valid command! Use /check help!"
+      stop
+    if arg-1 is "help":
+      send "&c&lVultureBox Checking &7- &cHelp %nl% > /Check check <player> -> Makes you check a player %nl% > /Check clear <player> -> Makes player clear, no evidence of hacking %nl% > /Check setspawn -> sets server spawn %nl% > /Check setroom -> sets checking room %nl% > /Check cheater <player> -> bans for cheating"
+    if arg-1 is "check":
+      if {checked::%arg-2's uuid%} is false:
+        set {checked::%arg-2's uuid%} to true
+        broadcast "{@prefix} &8%arg-2% &7Is being checked by &8%player%!"
+        send "{@prefix} &8%arg-2% &7You have a minute for joining &8/discord &7and join SS Waiting Room voice chat, you're being checked because staff may think you be &8CHEATING!" to arg-2
+        send "{@prefix} &8%arg-2% &7You can use &8/admit &7to admit for using cheats, if you do, the ban is shorter than regular cheats ban." to arg-2
+        send "{@prefix} &7Now checking &8%arg-2%" to player
+        teleport player to {room}
+        teleport arg-2 to {room}
+      else if {checked::%arg-2's uuid%} is true:
+        send "{@prefix} &7This player is being checked!"
+    if arg-1 is "clear":
+      if {checked::%arg-2's uuid%} is true:
+        teleport player to {spawn}
+        teleport arg-2 to {spawn}
+        set {checked::%arg-2's uuid%} to false
+        broadcast "{@prefix} &7It turned out that &8%arg-2% is &8clear!"
+        send "{@prefix} &7You've set &8%arg-2% as a clear!"
+      if {checked::%arg-2's uuid%} is false:
+        send "{@prefix} &7This person isn't being checked"
+    if arg-1 is "setspawn":
+      set {spawn} to location of player
+      send "{@prefix} &7You succesfully have set spawn!"
+    if arg-1 is "setroom":
+      set {room} to location of player
+      send "{@prefix} &7You succesfully have set checking room!"
+    if arg-1 is "hacking":
+      broadcast "{@prefix} &8%player% &7Banned &8%arg-2% &7Because he was cheating!"
+      execute console command "tempban %arg-2% 10d Cheats - Was checked by &8%player%"
+      set {checked::%arg-2's uuid%} to false
+    if arg-1 is "refused":
+      broadcast "{@prefix} &8%player% &7Banned &8%arg-2% &7Because he refused to screenshare!"
+      execute console command "tempban %arg-2% 17d Refused to screenshare - Was checked by &8%player%"
+
+command /admit:
+  trigger:
+    if {checked::%player's uuid%} is true:
+      execute console command "tempban %player% 4d &7Confessing to cheats, thank you for confessing it helps alot. Your ban is shorter than regular ban for cheating!"
+      broadcast "{@prefix} &8%player% &7Just confessed to &8cheating!"
+    if {checked::%player's uuid%} is false:
+      send "{@prefix} &8You're not being checked by any admin!"
+      send "{@prefix} &7You can only use this command when being checked!"
+
+on command:
+  if {checked::%player's uuid%} is true:
+    cancel event
+    send "&4You cant use commands while being checked!"
+
+on quit:
+  if {checked::%player's uuid%} is true:
+    execute console command "tempban %player% 9d Leaving the server while being checked."
+    set {checked::%player's uuid%} to false
+    broadcast "{@prefix} &8%player% &7Logged out when while checked!"
+on first join:
+  set {checked::%player's uuid%} to false
+on chat:
+  if {checked::%player's uuid%} is true:
+    if message is "Admit" or "admit":
+      cancel event
+      execute console command "tempban %player% 4d &7Confessing to cheats, thank you for confessing it helps alot. Your ban is shorter than regular ban for cheating!"
+      broadcast "{@prefix} &8%player% &7Just confessed to &8cheating!"
+      set {checked::%player's uuid%} to false
+    else:
+      cancel event
+      broadcast "&8[&cCHECKED&8] &8%player% &7%message%"
