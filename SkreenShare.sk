@@ -9,7 +9,7 @@ command /check [<text>] [<offline player>]:
       send "&cYou need to enter valid command! Use /check help!"
       stop
     if arg-1 is "help":
-      send "&c&lVultureBox Checking &7- &cHelp %nl% > /Check check <player> -> Makes you check a player %nl% > /Check clear <player> -> Makes player clear, no evidence of hacking %nl% > /Check setspawn -> sets server spawn %nl% > /Check setroom -> sets checking room %nl% > /Check cheater <player> -> bans for cheating"
+      send "{@prefix} Checking &7- &cHelp %nl% > /Check check <player> -> Makes you check a player %nl% > /Check clear <player> -> Makes player clear, no evidence of hacking %nl% > /Check setspawn -> sets server spawn %nl% > /Check setroom -> sets checking room %nl% > /Check cheater <player> -> bans for cheating"
     if arg-1 is "check":
       if {checked::%arg-2's uuid%} is false:
         set {checked::%arg-2's uuid%} to true
